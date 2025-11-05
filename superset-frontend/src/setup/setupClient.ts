@@ -67,6 +67,7 @@ function getDefaultConfiguration(): ClientConfig {
       ? (window?.location?.protocol as 'http:' | 'https:')
       : undefined,
     host: window.location?.host || '',
+    appRoot: bootstrapData.common.application_root || '',
     csrfToken: csrfToken || cookieCSRFToken,
     fetchRetryOptions,
   };
