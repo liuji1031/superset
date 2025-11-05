@@ -497,9 +497,13 @@ def cached_common_bootstrap_data(  # pylint: disable=unused-argument
             )
         frontend_config["AUTH_PROVIDERS"] = oauth_providers
 
+    # JUPYTERHUB: Prefer JUPYTERHUB_SERVICE_PREFIX env var for dynamic prefixes
+    # This ensures bootstrap data includes the correct prefix even if APPLICATION_ROOT
+    # hasn't been set yet by AppRootMiddleware
+    jupyterhub_prefix = os.environ.get('JUPYTERHUB_SERVICE_PREFIX', '').rstrip('/')
     bootstrap_data = {
-        "application_root": app.config["APPLICATION_ROOT"],
-        "static_assets_prefix": app.config["STATIC_ASSETS_PREFIX"],
+        "application_root": jupyterhub_prefix or app.config.get("APPLICATION_ROOT", ""),
+        "static_assets_prefix": jupyterhub_prefix or app.config.get("STATIC_ASSETS_PREFIX", ""),
         "conf": frontend_config,
         "locale": language,
         "d3_format": app.config.get("D3_FORMAT"),
