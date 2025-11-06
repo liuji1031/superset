@@ -101,7 +101,7 @@ function Footer({
         schema: datasetObject.schema,
         table_name: datasetObject.table_name,
       };
-      createResource(data).then(response => {
+      createResource(data).then((response: number | undefined) => {
         if (!response) {
           return;
         }
