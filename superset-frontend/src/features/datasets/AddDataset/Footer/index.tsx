@@ -36,6 +36,7 @@ import {
   LOG_ACTIONS_DATASET_CREATION_SUCCESS,
 } from 'src/logger/LogUtils';
 import { DatasetObject } from '../types';
+import getBootstrapData from 'src/utils/getBootstrapData';
 
 interface FooterProps {
   url: string;
@@ -106,11 +107,14 @@ function Footer({
         }
         if (typeof response === 'number') {
           logEvent(LOG_ACTIONS_DATASET_CREATION_SUCCESS, datasetObject);
+          // JUPYTERHUB: Get application_root from bootstrap data to construct correct URLs
+          const bootstrapData = getBootstrapData();
+          const applicationRoot = bootstrapData?.common?.application_root || '';
           // When a dataset is created the response we get is its ID number
           if (createChart) {
-            history.push(`/chart/add/?dataset=${datasetObject.table_name}`);
+            history.push(`${applicationRoot}/chart/add/?dataset=${datasetObject.table_name}`);
           } else {
-            history.push('/tablemodelview/list/');
+            history.push(`${applicationRoot}/tablemodelview/list/`);
           }
         }
       });

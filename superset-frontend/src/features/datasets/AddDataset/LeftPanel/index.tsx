@@ -29,6 +29,7 @@ import {
 } from 'src/features/datasets/AddDataset/types';
 import { Table } from 'src/hooks/apiResources';
 import { Typography } from '@superset-ui/core/components/Typography';
+import getBootstrapData from 'src/utils/getBootstrapData';
 
 interface LeftPanelProps {
   setDataset: Dispatch<SetStateAction<object>>;
@@ -179,25 +180,32 @@ export default function LeftPanel({
     ),
     [datasetNames],
   );
-  const getDatabaseEmptyState = (emptyResultsWithSearch: boolean) => (
-    <EmptyState
-      image="empty.svg"
-      title={
-        emptyResultsWithSearch
-          ? t('No databases match your search')
-          : t('No databases available')
-      }
-      description={
-        <span>
-          {t('Manage your databases')}{' '}
-          <Typography.Link href="/databaseview/list">
-            {t('here')}
-          </Typography.Link>
-        </span>
-      }
-      size="small"
-    />
-  );
+  const getDatabaseEmptyState = (emptyResultsWithSearch: boolean) => {
+    // JUPYTERHUB: Get application_root from bootstrap data to construct correct URLs
+    const bootstrapData = getBootstrapData();
+    const applicationRoot = bootstrapData?.common?.application_root || '';
+    const databaseViewUrl = `${applicationRoot}/databaseview/list`;
+    
+    return (
+      <EmptyState
+        image="empty.svg"
+        title={
+          emptyResultsWithSearch
+            ? t('No databases match your search')
+            : t('No databases available')
+        }
+        description={
+          <span>
+            {t('Manage your databases')}{' '}
+            <Typography.Link href={databaseViewUrl}>
+              {t('here')}
+            </Typography.Link>
+          </span>
+        }
+        size="small"
+      />
+    );
+  };
 
   return (
     <LeftPanelStyle>
