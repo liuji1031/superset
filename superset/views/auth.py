@@ -16,9 +16,10 @@
 # under the License.
 
 import logging
+import os
 from typing import Optional
 
-from flask import g, redirect, request, url_for
+from flask import g, redirect, request
 from flask_appbuilder import expose
 from flask_appbuilder.const import LOGMSG_ERR_SEC_NO_REGISTER_HASH
 from flask_appbuilder.security.decorators import no_cache
@@ -37,11 +38,20 @@ class SupersetAuthView(BaseSupersetView, AuthView):
     @expose("/", methods=["GET", "POST"])
     @no_cache
     def login(self, provider: Optional[str] = None) -> WerkzeugResponse:
+        # Get JupyterHub prefix from environment or Flask config
+        jupyterhub_prefix = os.environ.get('JUPYTERHUB_SERVICE_PREFIX', '').rstrip('/')
+        if not jupyterhub_prefix:
+            # Fallback to APPLICATION_ROOT from Flask config
+            jupyterhub_prefix = self.appbuilder.app.config.get('APPLICATION_ROOT', '').rstrip('/')
+        
         # If already authenticated, redirect appropriately
         if g.user is not None and g.user.is_authenticated:
             # Check for next parameter
             next_url = request.args.get("next") or request.form.get("next")
             if next_url:
+                # Prepend JupyterHub prefix if the URL is relative and doesn't already have it
+                if next_url.startswith("/") and not next_url.startswith(jupyterhub_prefix):
+                    next_url = jupyterhub_prefix + next_url
                 return redirect(next_url)
             return redirect(self.appbuilder.get_url_for_index)
         
@@ -60,6 +70,9 @@ class SupersetAuthView(BaseSupersetView, AuthView):
                     if next_url:
                         # Ensure the next_url is safe (relative URL)
                         if next_url.startswith("/"):
+                            # Prepend JupyterHub prefix if the URL doesn't already have it
+                            if not next_url.startswith(jupyterhub_prefix):
+                                next_url = jupyterhub_prefix + next_url
                             return redirect(next_url)
                     
                     # Default redirect to index
