@@ -17,6 +17,10 @@ specific language governing permissions and limitations
 under the License.
 -->
 
+# JupyterHub Integration for Apache Superset
+
+see [JUPYTERHUB_INTEGRATION_FIX.md](JUPYTERHUB_INTEGRATION_FIX.md) for more details.
+
 # Superset
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/license/apache-2-0)
